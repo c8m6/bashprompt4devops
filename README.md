@@ -4,6 +4,8 @@ This little bash script make your bash much more pretty
 and show you some information about kubelet, git and
 much more.
 
+Additionaly it merged the history from all terminals.
+
 # Install
 
 Download and source the script:
