@@ -55,7 +55,7 @@ function _bp_cmd_time_stop {
 
 trap '_bp_cmd_time_start' DEBUG
 
-PROMPT_COMMAND="_bp_cmd_time_stop ; history -a ;#history -n"
+PROMPT_COMMAND="_bp_cmd_time_stop ; history -a ; history -n"
 
 function _bp_lastcmdstat () {
   if [ ! $1 -eq 0 ] ; then
