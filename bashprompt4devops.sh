@@ -77,8 +77,9 @@ function _bp_lastcmdstat () {
 function _bp_pwd () {
   local current_dir=$(dirs +0)
   local current_repo=$(git rev-parse --show-toplevel 2> /dev/null)
+  current_repo=${current_repo/$HOME/\~}
 
-  if [ "${current_repo}" == "" ] ; then
+  if [ "${current_repo}" != "" ] ; then
     local dir_msg="${cyan}${current_repo}/${reset}"
   else
     oIFS="$IFS"
@@ -88,12 +89,12 @@ function _bp_pwd () {
     local current_repo_name=${current_repo##*/}
 
     for path_element in $current_dir ; do
-      if [ "$path_element" == "$current_repo_name" ] ; then
+      if [ "${path_element}" == "${current_repo_name}" ] ; then
         path_part="${path_part}/${blue}${path_element}${cyan}"
-      elif [ "$path_element" == "~" ] ; then
-        path_part="${path_part}${path_element}"
+      elif [ "${path_element}" == '~' ] ; then
+        path_part='~'
       else
-        path_part="${path_part}/${path_element}"
+        path_part="${path_part}${path_element}"
       fi
     done
 
