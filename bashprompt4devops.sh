@@ -80,7 +80,7 @@ function _bp_pwd () {
   local current_dir=$(dirs +0)
   local current_repo=$(git rev-parse --show-toplevel 2> /dev/null)
   current_repo=${current_repo/$HOME/\~}
-  current_repo_name=${current_repo#*/}
+  current_repo_name=${current_repo##*/}
 
   oIFS="$IFS"
   IFS='/'
