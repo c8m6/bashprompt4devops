@@ -19,6 +19,9 @@
 #
 #                 https://github.com/c8m6/
 #
+# Configure with environment variables:
+# export BP_DISABLE_CLOCK=true
+# export BP_DISABLE_EXITSTATUS=true
 ###########################################################
 
 # color definitions
@@ -58,20 +61,22 @@ trap '_bp_cmd_time_start' DEBUG
 PROMPT_COMMAND="_bp_cmd_time_stop ; history -a ; history -n"
 
 function _bp_lastcmdstat () {
-  if [ ! $1 -eq 0 ] ; then
-    local error_color=$red
-    local error_sign='😱'
-    local error_code=" ${1} "
-  else
-    local error_color=''
-    local error_sign=''
-  fi
+  if [ -z $BP_DISABLE_EXITSTATUS ] ; then
+    if [ ! $1 -eq 0 ] ; then
+      local error_color=$red
+      local error_sign='😱'
+      local error_code=" ${1} "
+    else
+      local error_color=''
+      local error_sign=''
+    fi
 
-  if [ $execution_time -gt -0 ] ; then
-    local msg_time="${grey}⌚${cmd_runtime}${reset}"
-  fi
+    if [ $execution_time -gt -0 ] ; then
+      local msg_time="${grey}⌚${cmd_runtime}${reset}"
+    fi
 
-  echo -ne "${error_color}${error_sign}${error_code}${msg_time}"
+    echo -ne "${error_color}${error_sign}${error_code}${msg_time}"
+  fi
 }
 
 function _bp_pwd () {
@@ -109,7 +114,9 @@ function _bp_kubectl () {
 }
 
 function _bp_clock () {
-  echo -ne "${grey}|${blue}⏰$(date +%H:%M)${reset}"
+  if [ -z $BP_DISABLE_CLOCK ] ; then
+    echo -ne "${grey}|${blue}⏰$(date +%H:%M)${reset}"
+  fi
 }
 
 function _bp_userandhost () {
