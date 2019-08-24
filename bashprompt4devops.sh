@@ -115,7 +115,7 @@ function _bp_kubectl () {
 
 function _bp_clock () {
   if [ -z $BP_DISABLE_CLOCK ] ; then
-    echo -ne "${grey}|${blue}⏰$(date +%H:%M)${reset}"
+    echo -ne "${grey}|${blue}🕑$(date +%H:%M)${reset}"
   fi
 }
 

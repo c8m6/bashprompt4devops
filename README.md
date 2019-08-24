@@ -12,3 +12,8 @@ Download and source the script:
 ```
 echo 'source ~/.bash/bashprompt4devops.sh' >> ~/.bashrc
 ```
+
+# Ugly fancy emojis?
+```
+sudo apt remove fonts-noto-color-emoji
+```
