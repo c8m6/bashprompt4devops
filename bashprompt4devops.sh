@@ -58,7 +58,7 @@ function _bp_cmd_time_stop {
 
 trap '_bp_cmd_time_start' DEBUG
 
-PROMPT_COMMAND="_bp_cmd_time_stop ; history -a ; history -n"
+PROMPT_COMMAND="_bp_cmd_time_stop ; history -a"
 
 function _bp_lastcmdstat () {
   if [ -z $BP_DISABLE_EXITSTATUS ] ; then
