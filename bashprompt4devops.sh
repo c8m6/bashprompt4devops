@@ -37,6 +37,8 @@ reset='\e[0m'
 yellow='\e[33m'
 blue='\e[35m'
 
+tty_width=$(stty size | awk '{print $2}')
+
 # functions
 function _bp_cmd_time_start () {
   timer=${timer:-$SECONDS}
@@ -202,7 +204,14 @@ function _bp_gitstatus () {
         local msg_behind="↓${behind}"
       fi
 
-      local message="${color} ${branch} ${msg_clean}${msg_warn_st}${msg_conflict}${msg_changed}${msg_untracked}${msg_behind}${msg_ahead}"
+      local branch_maxlength=$(echo "$tty_width / 5" | bc | cut -d '.' -f 1)
+      if [ ${#branch} -gt $branch_maxlength ] ; then
+        local branch_name=$(printf "%.$[branch_maxlength-3]s..." "${branch}")
+      else
+        local branch_name=$branch
+      fi
+
+      local message="${color} ${branch_name} ${msg_clean}${msg_warn_st}${msg_conflict}${msg_changed}${msg_untracked}${msg_behind}${msg_ahead}"
      	echo -ne "${grey}|${message}${reset}"
       )
   fi
