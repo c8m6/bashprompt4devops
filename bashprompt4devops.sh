@@ -87,6 +87,8 @@ function _bp_pwd () {
   local path_element
   local path_part
   local current_dir=$(dirs +0)
+  local last_dir=$(basename ${current_dir})
+  local path_maxlength=$(echo "$TERM_WIDTH / 3" | bc | cut -d '.' -f 1)
   local current_repo=$(git rev-parse --show-toplevel 2> /dev/null)
   current_repo=${current_repo/$HOME/\~}
   current_repo_name=${current_repo##*/}
@@ -100,11 +102,16 @@ function _bp_pwd () {
       elif [ "${path_element}" == '~' ] ; then
         path_part='~'
       else
-        path_part="${path_part}/${path_element}"
+        if [[ ${#current_dir} -gt $path_maxlength && "${path_element}" != "${last_dir}" ]]; then
+          path_part="${path_part}/${path_element:0:1}"
+        else
+          path_part="${path_part}/${path_element}"
+        fi
       fi
     fi
   done
   IFS=$oIFS
+
   local dir_msg="${cyan}${path_part}/${reset}"
 
   echo -ne "${dir_msg}"
@@ -206,7 +213,7 @@ function _bp_gitstatus () {
         local msg_behind="↓${behind}"
       fi
 
-      local branch_maxlength=$(echo "$TERM_WIDTH / 5" | bc | cut -d '.' -f 1)
+      local branch_maxlength=$(echo "$TERM_WIDTH / 6" | bc | cut -d '.' -f 1)
       if [ ${#branch} -gt $branch_maxlength ] ; then
         local branch_name=$(printf "%.$[branch_maxlength-3]s..." "${branch}")
       else
