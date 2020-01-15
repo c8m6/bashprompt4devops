@@ -120,7 +120,9 @@ function _bp_pwd () {
 function _bp_kubectl () {
   if [ `which kubectl` ] && [ -f ~/.kube/config ] ; then
     local current_context=$(cat ~/.kube/config | grep "current-context:" | sed "s/current-context: //")
-    echo -ne "${grey}|${green}☸ ${current_context}${reset}"
+    if [ ! -z $current_context ] ; then
+      echo -ne "${grey}|${green}☸ ${current_context}${reset}"
+    fi
   fi
 }
 
@@ -199,7 +201,7 @@ function _bp_gitstatus () {
       fi
 
       if [ $untracked -gt 0 ] ; then
-        local msg_untracked="٭${untracked}"
+        local msg_untracked="⚛${untracked}"
       fi
 
       if [ $conflicts -gt 0 ] ; then
