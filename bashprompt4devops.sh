@@ -74,7 +74,7 @@ function _bp_lastcmdstat () {
   if [ -z $BP_DISABLE_EXITSTATUS ] ; then
     if [ ! $1 -eq 0 ] ; then
       local error_color=$red
-      local error_sign='😱'
+      local error_sign='⭍'
       local error_code=" ${1} "
     else
       local error_color=''
@@ -82,7 +82,7 @@ function _bp_lastcmdstat () {
     fi
 
     if [ $execution_time -gt -0 ] ; then
-      local msg_time="${grey}⌚${cmd_runtime}${reset}"
+      local msg_time="${grey}${cmd_runtime}${reset}"
     fi
 
     echo -ne "${error_color}${error_sign}${error_code}${msg_time}"
@@ -134,7 +134,7 @@ function _bp_kubectl () {
 
 function _bp_clock () {
   if [ -z $BP_DISABLE_CLOCK ] ; then
-    echo -ne "${grey}|${blue}🕑$($CMD_DATE +%H:%M)${reset}"
+    echo -ne "${grey}|${blue}$($CMD_DATE +%H:%M)${reset}"
   fi
 }
 

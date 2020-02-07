@@ -6,6 +6,10 @@ much more.
 
 Additionaly it merged the history from all terminals.
 
+![Screenshot-1](docs/media/screenshot_01.png)
+
+![Screenshot-2](docs/media/screenshot_02.png)
+
 # Install
 
 Download and source the script:
