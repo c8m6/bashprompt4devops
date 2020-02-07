@@ -37,6 +37,12 @@ reset='\e[0m'
 yellow='\e[33m'
 blue='\e[35m'
 
+if [ $(which gdate) ] ; then
+  CMD_DATE='gdate' # used on MAC OS (needs coreutils)
+else
+  CMD_DATE='date'
+fi
+
 # functions
 function _bp_get_ttywidth () {
   export TERM_WIDTH=$(stty size | awk '{print $2}')
@@ -49,13 +55,13 @@ function _bp_cmd_time_start () {
 function _bp_cmd_time_stop {
   execution_time=$(($SECONDS - $timer))
   if [ $execution_time -lt 10 ] ; then
-    cmd_runtime="$(date -d@${execution_time} -u +%ss)"
+    cmd_runtime="$($CMD_DATE -d@${execution_time} -u +%ss)"
   elif [ $execution_time -lt 600 ] ; then
-    cmd_runtime="$(date -d@${execution_time} -u '+%mm %Ss')"
+    cmd_runtime="$($CMD_DATE -d@${execution_time} -u '+%mm %Ss')"
   elif [ $execution_time -lt 3600 ] ; then
-    cmd_runtime="$(date -d@${execution_time} -u '+%Mm %Ss')"
+    cmd_runtime="$($CMD_DATE -d@${execution_time} -u '+%Mm %Ss')"
   else
-    cmd_runtime="$(date -d@${execution_time} -u '+%Hh %Mm %Ss')"
+    cmd_runtime="$($CMD_DATE -d@${execution_time} -u '+%Hh %Mm %Ss')"
   fi
   unset timer
 }
@@ -128,7 +134,7 @@ function _bp_kubectl () {
 
 function _bp_clock () {
   if [ -z $BP_DISABLE_CLOCK ] ; then
-    echo -ne "${grey}|${blue}🕑$(date +%H:%M)${reset}"
+    echo -ne "${grey}|${blue}🕑$($CMD_DATE +%H:%M)${reset}"
   fi
 }
 
