@@ -118,7 +118,7 @@ function _bp_pwd () {
 }
 
 function _bp_kubectl () {
-  if [ `which kubectl` ] && [ -f ~/.kube/config ] ; then
+  if [ -x "$(command -v kubectl)" ] && [ -f ~/.kube/config ] ; then
     local current_context=$(cat ~/.kube/config | grep "current-context:" | sed "s/current-context: //")
     if [ ! -z $current_context ] ; then
       echo -ne "${grey}|${green}☸ ${current_context}${reset}"
