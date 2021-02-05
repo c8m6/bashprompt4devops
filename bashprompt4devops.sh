@@ -118,11 +118,14 @@ function _bp_pwd () {
 }
 
 function _bp_kubectl () {
-  if [ -x "$(command -v kubectl)" ] && [ -f ~/.kube/config ] ; then
-    local current_context=$(cat ~/.kube/config | grep "current-context:" | sed "s/current-context: //")
-    if [ ! -z $current_context ] ; then
-      echo -ne "${grey}|${green}☸ ${current_context}${reset}"
-    fi
+  local current_context=$(oc config current-context 2> /dev/null || kubectl config current-context 2> /dev/null || /bin/false)
+  if [ $current_context ] ; then
+    local current_context_color
+    case $current_context in
+      *Prod*|*prod* )   current_context_color=$red ;;
+      *)                current_context_color=$green ;;
+    esac
+    echo -ne "${grey}|${current_context_color}☸ ${current_context}${reset}"
   fi
 }
 
