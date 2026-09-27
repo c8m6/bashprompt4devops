@@ -29,7 +29,7 @@ See [capture details](docs/media/README.md) for the scenarios and rendering setu
 
 - An interactive Bash or zsh session. Tested with Bash **3.2.57**, Bash **5.2.26**
   and zsh **5.9** on macOS.
-- Git for the Git segment; `kubectl` for the optional Kubernetes segment.
+- Git for the Git segment; `oc` or `kubectl` for the optional Kubernetes segment.
 - Standard Unix utilities. Neither `bc` nor GNU `date`/`gdate` is required.
 - A UTF-8 terminal. A [Nerd Font](https://www.nerdfonts.com/font-downloads)
   is recommended for the branch glyph and other symbols.
@@ -98,11 +98,11 @@ segments. The third line is reserved for typing commands.
 
 | Display | Meaning |
 | --- | --- |
-| `⭍ 1` | The previous command failed with exit status `1`. |
+| `! 1` | The previous command failed with exit status `1`. |
 | `2s`, `3m 05s`, `25h 01m 01s` | Command runtime in whole seconds. Time spent waiting at the prompt is excluded. |
 | `user@host` | Current user and host; a red user indicates root, a yellow host indicates an SSH session. |
 | `~/p/project/` | Current path, with intermediate directories abbreviated when it is long. The repository directory is highlighted. |
-| ` main` | Current Git branch. Long names are shortened; a detached HEAD appears as `(detached)`. |
+| Branch icon followed by `main` | Current Git branch. Long names are shortened; a detached HEAD appears as `(detached)`. |
 | `✔` | The local working tree is clean. It can still be ahead of or behind its upstream. |
 | `✎2` | Two changed tracked entries, including staged and unstaged changes. |
 | `⚛1` | One untracked entry. Git may group an untracked directory into one entry. |
@@ -143,10 +143,11 @@ git fetch
 
 ### Kubernetes
 
-The context comes from `kubectl config current-context`, respecting `KUBECONFIG`
+The script automatically prefers `oc` when available and falls back to `kubectl`.
+The context comes from `config current-context`, respecting `KUBECONFIG`
 and merged kubeconfig files. This reads local configuration; it does not query
-the Kubernetes API server. The segment is omitted if `kubectl`, configuration
-or a current context is unavailable.
+the Kubernetes API server. The segment is omitted if both commands are unavailable
+or there is no configuration or current context.
 
 ### History and shell integration
 
@@ -159,9 +160,11 @@ zsh keeps its existing history configuration. This script does not enable zsh
 history sharing.
 
 Existing Bash `PROMPT_COMMAND` hooks and DEBUG traps are retained. zsh uses
-`precmd_functions` and `preexec_functions`. The script replaces `PS1`, configures
-prompt expansion and only initializes once per shell. Noninteractive sessions
-are ignored.
+`precmd_functions` and `preexec_functions`. Bash with bash-preexec (including
+iTerm2 shell integration) uses its existing hook arrays. The script sets `PS1`
+before each prompt, configures prompt expansion and only initializes once per
+shell. Noninteractive sessions are ignored. Conda's environment prefix (such as
+`(base)`) is hidden; environment activation continues to work normally.
 
 ## Troubleshooting
 
@@ -174,8 +177,8 @@ are ignored.
   are actually using. Load this script after other prompt themes or frameworks.
 - **Remote counters look stale:** they represent the last fetched state. Run
   `git fetch` to refresh it immediately, and check that the branch has an upstream.
-- **No Kubernetes segment:** run `kubectl config current-context` and check your
-  `KUBECONFIG` or `~/.kube/config`.
+- **No Kubernetes segment:** run `oc config current-context` (or
+  `kubectl config current-context`) and check your `KUBECONFIG` or `~/.kube/config`.
 - **Script changes do not appear after sourcing again:** open a fresh shell;
   repeated sourcing intentionally skips initialization. Configuration variables
   can still be changed in the current session.

@@ -4,7 +4,7 @@
 #  bash-prompt4devops.sh
 #
 #  This little bash script make your bash much more pretty
-#  and show you some information about kubelet, git and
+#  and show you some information about Kubernetes, git and
 #  much more.
 #
 #  Missing some fonts:
@@ -89,6 +89,7 @@ function _bp_cmd_time_stop {
 
 function _bp_precmd () {
   _bp_exitstatus=$?
+  PS1='$(_bp_prompt)'
   _bp_ready=false
   _bp_cmd_time_stop
   if [ -n "${BASH_VERSION}" ] && [ -n "${HISTFILE}" ] && [ "$HISTFILE" != /dev/null ] ; then
@@ -141,7 +142,7 @@ function _bp_lastcmdstat () {
   if [ "${BP_DISABLE_EXITSTATUS}" != true ] ; then
     if [ ! $1 -eq 0 ] ; then
       local error_color=$red
-      local error_sign='⭍'
+      local error_sign='!'
       local error_code=" ${1} "
     else
       local error_color=''
@@ -196,8 +197,16 @@ function _bp_pwd () {
 }
 
 function _bp_kubectl () {
-  if command -v kubectl > /dev/null 2>&1 && { [ -n "${KUBECONFIG}" ] || [ -f "$HOME/.kube/config" ]; } ; then
-    local current_context=$(kubectl config current-context 2> /dev/null)
+  local kube_command
+  if command -v oc > /dev/null 2>&1 ; then
+    kube_command=oc
+  elif command -v kubectl > /dev/null 2>&1 ; then
+    kube_command=kubectl
+  else
+    return
+  fi
+  if [ -n "${KUBECONFIG}" ] || [ -f "$HOME/.kube/config" ] ; then
+    local current_context=$("$kube_command" config current-context 2> /dev/null)
     if [ -n "$current_context" ] ; then
       printf '%s' "${grey}|${green}☸ $(_bp_escape "$current_context")${reset}"
     fi
@@ -335,6 +344,11 @@ if [ -n "${ZSH_VERSION}" ] ; then
   typeset -ga precmd_functions preexec_functions
   precmd_functions=(_bp_precmd "${precmd_functions[@]}" _bp_cmd_time_arm)
   preexec_functions+=( _bp_cmd_time_start )
+elif declare -F __bp_precmd_invoke_cmd > /dev/null ; then
+  # bash-preexec (including iTerm2) owns PROMPT_COMMAND and the DEBUG trap.
+  shopt -s promptvars histappend
+  precmd_functions=(_bp_precmd "${precmd_functions[@]}" _bp_cmd_time_arm)
+  preexec_functions+=( _bp_cmd_time_start )
 else
   shopt -s promptvars histappend
   # Preserve existing DEBUG traps and both string and array prompt hooks.
@@ -343,13 +357,13 @@ else
   _bp_debug_trap=${_bp_debug_trap% DEBUG}
   eval "_bp_debug_trap=${_bp_debug_trap:-''}"
   # Bash 3.2 restores DEBUG traps on source/function return; install at the prompt.
-  printf -v _bp_debug_command 'trap %q DEBUG' "${_bp_debug_trap:+${_bp_debug_trap}; }_bp_cmd_time_start"
+  printf -v _bp_debug_command 'trap %q DEBUG' "${_bp_debug_trap}"$'\n''_bp_cmd_time_start'
   _bp_debug_command='if [ "${_bp_debug_installed}" != true ] ; then '"${_bp_debug_command}"'; _bp_debug_installed=true; fi; _bp_restore_status'
   unset _bp_debug_trap
   if [[ $(declare -p PROMPT_COMMAND 2> /dev/null) = 'declare -a '* ]] ; then
     PROMPT_COMMAND=(_bp_precmd "$_bp_debug_command" "${PROMPT_COMMAND[@]}" _bp_cmd_time_arm)
   else
-    PROMPT_COMMAND="_bp_precmd; ${_bp_debug_command}; ${PROMPT_COMMAND:+${PROMPT_COMMAND}; }_bp_cmd_time_arm"
+    PROMPT_COMMAND="_bp_precmd; ${_bp_debug_command}"$'\n'"${PROMPT_COMMAND}"$'\n''_bp_cmd_time_arm'
   fi
   unset _bp_debug_command
 fi

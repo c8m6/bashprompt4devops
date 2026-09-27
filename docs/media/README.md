@@ -16,6 +16,6 @@ fetching is disabled during capture, and the fixture's remote refs are refreshed
 explicitly. No personal repository or cluster credentials are used.
 
 Rendering uses an 88-column terminal, a dark ANSI palette and the DejaVu Sans Mono Nerd
-Font Mono, with [Noto Sans Symbols 2](https://github.com/google/fonts/tree/main/ofl/notosanssymbols2)
-as a fallback for the exit-status glyph. Colors can look different in your own terminal. The clock shows the
+Font Mono. The exit-status marker is a plain `!` and needs no special font.
+Colors can look different in your own terminal. The clock shows the
 capture's local time.
